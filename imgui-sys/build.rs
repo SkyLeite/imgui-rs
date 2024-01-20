@@ -58,10 +58,10 @@ fn main() -> std::io::Result<()> {
     if !wasm_enabled {
         // C++ compiler
         let mut build = cc::Build::new();
-        build.cpp(true);
+        build.cpp(false);
 
         // imgui uses C++11 stuff from v1.87 onwards
-        build.flag_if_supported("-std=c++11");
+        build.flag("-std=gnu++11");
 
         // Set defines for compiler
         for (key, value) in DEFINES.iter() {
@@ -104,11 +104,11 @@ fn main() -> std::io::Result<()> {
         // Avoid the if-supported flag functions for easy cases, as they're
         // kinda costly.
         if compiler.is_like_gnu() || compiler.is_like_clang() {
-            build.flag("-fno-exceptions").flag("-fno-rtti");
+            build.flag("-fno-exceptions").flag("-fno-rtti").flag("-fno-threadsafe-statics");
         }
 
         // Build imgui lib, suppressing warnings.
-        build.warnings(false).file(imgui_cpp).compile("libcimgui.a");
+        build.warnings(false).file(imgui_cpp).static_flag(true).shared_flag(false).compile("libcimgui.a");
     }
     Ok(())
 }
