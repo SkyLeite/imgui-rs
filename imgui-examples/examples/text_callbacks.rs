@@ -3,10 +3,8 @@ use imgui::*;
 mod support;
 
 fn main() {
-    let system = support::init(file!());
-    let mut buffers = vec![String::default(), String::default(), String::default()];
-
-    system.main_loop(move |_, ui| {
+    let mut buffers = [String::default(), String::default(), String::default()];
+    support::simple_init(file!(), move |_, ui| {
         ui.window("Input text callbacks")
             .size([500.0, 300.0], Condition::FirstUseEver)
             .build(|| {
@@ -70,7 +68,7 @@ fn main() {
                 struct Wrapper<'a>(&'a mut String);
                 impl<'a> InputTextCallbackHandler for Wrapper<'a> {
                     fn on_always(&mut self, data: TextCallbackData) {
-                        *self.0 = data.str().to_owned();
+                        data.str().clone_into(self.0);
                     }
                 }
 
